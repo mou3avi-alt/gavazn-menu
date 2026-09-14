@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#171009">
+<title>کافی‌شاپ گوزن | منو و سفارش آنلاین</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦌</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#171009;--bg2:#20160d;--card:#241a11;--line:rgba(242,231,213,.09);--cream:#f2e7d5;--muted:#b4a084;
+--amber:#e0a63e;--acc:#e8a84b;--red:#e05656;--green:#7ddb8a;--fd:'Lalezar',cursive;--fb:'Vazirmatn',tahoma,sans-serif}
+body[data-cat=cold]{--acc:#86d7e4}body[data-cat=shake]{--acc:#f0a3c0}body[data-cat=hot]{--acc:#e8a84b}body[data-cat=fruit]{--acc:#ff9e6d}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--fb);background:var(--bg);color:var(--cream);min-height:100vh;overflow-x:hidden;line-height:1.8}
+button,.tab,.act,.add-btn{touch-action:manipulation;cursor:pointer}
+input,textarea{font-size:16px;font-family:var(--fb)}
+::selection{background:var(--amber);color:#221407}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:#4a3826;border-radius:8px}
+.bg-layers{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:breathe 9s ease-in-out infinite alternate}
+.g1{width:520px;height:520px;background:#5a3a12;top:-160px;right:-120px}
+.g2{width:460px;height:460px;background:#24402c;bottom:-180px;left:-140px;animation-delay:-4s}
+@keyframes breathe{from{transform:scale(1);opacity:.4}to{transform:scale(1.15);opacity:.6}}
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.06;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+.wm{position:fixed;left:-2%;bottom:-7%;z-index:0;font-family:var(--fd);font-size:min(34vw,380px);color:rgba(224,166,62,.045);line-height:1;pointer-events:none}
+.wrap{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:0 clamp(14px,3vw,20px)}
+header{position:sticky;top:0;z-index:50;background:rgba(23,16,9,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.h-in{max-width:880px;margin:0 auto;padding:12px clamp(14px,3vw,20px);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand svg{width:clamp(38px,6vw,46px);height:clamp(38px,6vw,46px);flex-shrink:0}
+.brand h2{font-family:var(--fd);font-size:clamp(1.2rem,4vw,1.5rem);font-weight:400;line-height:1.1;white-space:nowrap}
+.brand small{display:block;font-size:.72rem;color:var(--muted)}
+.h-left{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hours{font-size:.75rem;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:5px 12px;white-space:nowrap}
+.lock-btn{background:transparent;border:1px solid var(--amber);color:var(--amber);border-radius:999px;padding:9px clamp(12px,2.5vw,18px);font-family:var(--fb);font-size:.82rem;font-weight:700;transition:.25s;white-space:nowrap}
+.lock-btn:hover{background:var(--amber);color:#221407}
+@media(max-width:600px){.hours{display:none}}
+@media(max-width:400px){.brand small{display:none}}
+.board{margin:clamp(16px,3vw,26px) auto 0;background:linear-gradient(160deg,#291d12,#1e150c 60%);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,34px);position:relative;overflow:hidden;display:grid;grid-template-columns:1.4fr 1fr;gap:16px;align-items:center}
+.board::before{content:'';position:absolute;inset:10px;border:1px dashed rgba(224,166,62,.18);border-radius:14px;pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;color:var(--amber);border:1px solid rgba(224,166,62,.4);background:rgba(224,166,62,.08);border-radius:999px;padding:4px 14px;margin-bottom:14px;animation:fadeUp .7s both}
+.board h1{font-family:var(--fd);font-size:clamp(2.2rem,8vw,4rem);font-weight:400;line-height:1.15;animation:fadeUp .7s .1s both}
+.board h1 .hl{color:var(--amber);position:relative;display:inline-block}
+.board h1 .hl::after{content:'';position:absolute;right:0;left:0;bottom:6px;height:9px;background:rgba(224,166,62,.22);z-index:-1;transform:skewX(-12deg)}
+.sub{color:var(--muted);font-size:clamp(.9rem,2.5vw,1.05rem);margin-top:8px;animation:fadeUp .7s .2s both}
+.rot{display:inline-block;color:var(--cream);font-weight:800;border-bottom:2px solid var(--acc);transition:.35s}
+.rot.hide{opacity:0;transform:translateY(8px)}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;animation:fadeUp .7s .3s both}
+.pill{font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.pill b{color:var(--acc)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.board-art{display:flex;justify-content:center;align-items:center;animation:fadeUp .8s .25s both}
+.cup-svg{width:clamp(130px,22vw,230px);filter:drop-shadow(0 14px 30px rgba(0,0,0,.5));animation:cupF 5s ease-in-out infinite alternate}
+@keyframes cupF{to{transform:translateY(-10px)}}
+.steam path{stroke:var(--cream);stroke-width:4;fill:none;stroke-linecap:round;opacity:0;animation:steam 3s ease-in-out infinite}
+.steam path:nth-child(2){animation-delay:1.4s}
+@keyframes steam{0%{opacity:0;transform:translateY(6px)}35%{opacity:.75}100%{opacity:0;transform:translateY(-14px)}}
+.ticker{overflow:hidden;border-block:1px solid var(--line);margin:20px 0;background:rgba(255,255,255,.015)}
+.ticker-track{display:flex;width:max-content;gap:26px;padding:10px 0;animation:tick var(--dur,46s) linear infinite}
+.ticker-track span{font-size:.85rem;color:var(--muted);white-space:nowrap}
+.ticker-track i{color:var(--amber);font-style:normal}
+@keyframes tick{to{transform:translateX(50%)}}
+.tabs{position:sticky;top:64px;z-index:40;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:12px 0;background:rgba(23,16,9,.92);backdrop-filter:blur(8px)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 6px;border:1px solid var(--line);border-radius:13px;background:transparent;color:var(--muted);font-family:var(--fb);transition:.28s}
+.tab .t-ic{font-size:1.35rem;transition:transform .3s}
+.tab .t-name{font-size:.85rem;font-weight:700}
+.tab .t-count{font-size:.68rem;background:rgba(255,255,255,.07);border-radius:999px;padding:1px 9px}
+.tab:hover{color:var(--cream);border-color:var(--acc)}
+.tab:hover .t-ic{transform:scale(1.25) rotate(-8deg)}
+.tab.active{color:var(--acc);border-color:var(--acc)}
+body[data-cat=cold] .tab.active{background:rgba(134,215,228,.1)}
+body[data-cat=hot] .tab.active{background:rgba(232,168,75,.1)}
+body[data-cat=shake] .tab.active{background:rgba(240,163,192,.1)}
+body[data-cat=fruit] .tab.active{background:rgba(255,158,109,.1)}
+.tab.active .t-count{background:var(--acc);color:#221407;font-weight:800}
+.toolbar{display:flex;gap:10px;align-items:center;margin:16px 0 8px;flex-wrap:wrap}
+.search{flex:1;min-width:min(100%,220px);position:relative}
+.search input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:12px 42px 12px 16px;color:var(--cream);transition:.25s}
+.search input:focus{outline:none;border-color:var(--acc)}
+.search::before{content:'🔍';position:absolute;right:15px;top:50%;transform:translateY(-50%);font-size:.85rem;opacity:.6}
+.result-count{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.panel-head{display:flex;align-items:center;gap:14px;margin:14px 0 16px}
+.ph-ic{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;flex-shrink:0;background:rgba(224,166,62,.12);border:1px solid var(--acc)}
+.panel-head h2{font-family:var(--fd);font-size:clamp(1.5rem,5vw,2rem);font-weight:400;line-height:1.1}
+.panel-head p{font-size:.8rem;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:10px;padding-bottom:110px}
+.row{background:rgba(255,255,255,.022);border:1px solid var(--line);border-radius:12px;padding:15px 16px;display:flex;align-items:center;gap:12px;transition:.3s}
+.row:hover{background:rgba(255,255,255,.05);border-color:var(--acc)}
+.row-main{flex:1;min-width:0}
+.row-line{display:flex;align-items:baseline;gap:10px}
+.row-line h3{font-size:1.02rem;font-weight:800}
+.badge{display:inline-flex;font-size:.64rem;font-weight:800;color:#221407;background:var(--amber);border-radius:999px;padding:2px 9px;margin-inline-start:7px;vertical-align:middle}
+.leader{flex:1;border-bottom:2px dotted rgba(242,231,213,.22);transform:translateY(-4px);min-width:16px}
+.price{flex-shrink:0;text-align:left;line-height:1.2}
+.price b{font-size:1.1rem;font-weight:900;color:var(--acc)}
+.price small{font-size:.66rem;color:var(--muted);margin-inline-start:4px}
+.row-main p{font-size:.78rem;color:var(--muted);margin-top:4px}
+.add-btn{flex-shrink:0;background:transparent;border:1px solid var(--acc);color:var(--acc);border-radius:999px;padding:8px 16px;font-family:var(--fb);font-size:.8rem;font-weight:800;transition:.25s;white-space:nowrap}
+.add-btn:hover{background:var(--acc);color:#221407}
+body.admin .add-btn{display:none}
+.row-acts{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.act{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:6px 12px;font-size:.74rem;font-family:var(--fb);transition:.2s;white-space:nowrap}
+.act:hover{color:var(--cream);border-color:var(--acc)}
+.act.del:hover,.act.del.confirm{border-color:var(--red);color:var(--red);background:rgba(224,86,86,.1)}
+.empty{text-align:center;padding:50px 20px;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}
+.empty .ei{font-size:2.6rem;display:block;margin-bottom:10px;animation:cupF 3s ease-in-out infinite alternate}
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.in{opacity:1;transform:none;transition:.55s var(--d,0s)}
+.setup-banner{background:rgba(224,86,86,.1);border:1px dashed var(--red);color:#e8a8a8;border-radius:12px;padding:12px 16px;font-size:.8rem;line-height:2;margin:12px 0}
+.admin-box{border:1px dashed var(--acc);border-radius:16px;background:rgba(224,166,62,.05);padding:clamp(14px,3vw,22px);margin:6px 0 22px;animation:fadeUp .4s both}
+.admin-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.admin-tabs button{position:relative;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:9px 18px;font-family:var(--fb);font-size:.82rem;font-weight:700;transition:.25s}
+.admin-tabs button.active{background:var(--amber);color:#221407;border-color:var(--amber)}
+.ord-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;background:var(--red);color:#fff;border-radius:999px;font-size:.68rem;font-weight:800;margin-inline-start:6px;padding:0 5px}
+.admin-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.admin-head h3{font-size:.95rem;font-weight:800;color:var(--acc)}
+#itemForm input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--cream)}
+#itemForm input:focus{outline:none;border-color:var(--acc)}
+#itemForm input.err{border-color:var(--red);animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.frow{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.frow>*{flex:1;min-width:min(100%,220px)}
+.frow.end{align-items:center;justify-content:space-between}
+.frow.end>*{flex:0 1 auto}
+.price-hint{font-size:.72rem;color:var(--muted);margin:-6px 0 12px}
+.toggle{display:flex;align-items:center;cursor:pointer;font-size:.83rem;font-weight:700;user-select:none}
+.toggle input{display:none}
+.toggle span{padding:8px 14px;border:1px solid var(--line);border-radius:999px;transition:.25s}
+.toggle input:checked+span{background:var(--amber);color:#221407;border-color:var(--amber)}
+.btn-amber{background:var(--amber);color:#221407;border:none;border-radius:10px;padding:12px 26px;font-family:var(--fb);font-size:.9rem;font-weight:800;transition:.25s}
+.btn-amber:hover{background:#f3bd55;transform:translateY(-2px)}
+.btn-amber:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 16px;font-family:var(--fb);font-size:.78rem;transition:.2s}
+.btn-ghost:hover{color:var(--cream);border-color:var(--cream)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.tools button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px 14px;font-family:var(--fb);font-size:.75rem;transition:.2s}
+.tools button:hover{color:var(--cream);border-color:var(--acc)}
+.qr-note{font-size:.8rem;color:var(--muted);line-height:2.1;margin-bottom:14px}
+.qr-note b{color:var(--cream)}
+.qr-note code{background:var(--bg2);color:var(--amber);padding:1px 8px;border-radius:6px;direction:ltr;display:inline-block;font-size:.72rem}
+.qr-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.qr-row input{flex:1;min-width:min(100%,230px);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--cream);direction:ltr;text-align:left}
+.qr-preview{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.qr-preview img{width:150px;height:150px;background:#fff;border-radius:12px;padding:8px;display:none}
+.qr-preview img.on{display:block}
+.qr-warn{font-size:.8rem;min-height:22px;color:var(--red);margin-top:8px}
+.qr-light-lbl{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted);cursor:pointer}
+/* سفارش‌ها */
+.o-card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.o-card.st-new{border-color:var(--amber)}
+.o-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.o-num{font-family:var(--fd);font-size:1.25rem}
+.o-time{font-size:.72rem;color:var(--muted)}
+.status-chip{font-size:.7rem;font-weight:800;border-radius:999px;padding:3px 12px;color:#221407}
+.o-items{font-size:.82rem;border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
+.o-items li{list-style:none;display:flex;justify-content:space-between;gap:8px}
+.o-items li span:last-child{color:var(--muted)}
+.o-cust{font-size:.82rem;margin-top:8px;color:var(--cream)}
+.o-cust small{color:var(--muted)}
+.o-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.o-actions button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:7px 16px;font-family:var(--fb);font-size:.76rem;transition:.2s}
+.o-actions button.next{border-color:var(--green);color:var(--green)}
+.o-actions button.danger:hover{border-color:var(--red);color:var(--red)}
+.o-actions button:hover{transform:translateY(-2px)}
+/* سبد خرید */
+.cart-fab{position:fixed;bottom:22px;left:22px;z-index:55;width:60px;height:60px;border-radius:50%;background:var(--amber);border:none;font-size:1.5rem;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.3s;display:grid;place-items:center}
+.cart-fab:hover{transform:scale(1.08)}
+.cart-fab .c-count{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;background:var(--red);color:#fff;border-radius:999px;font-size:.72rem;font-weight:800;display:grid;place-items:center;padding:0 5px;font-family:var(--fb)}
+body.admin .cart-fab{display:none}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(400px,94vw);background:var(--card);z-index:90;transform:translateX(-105%);transition:transform .35s cubic-bezier(.2,.9,.3,1);display:flex;flex-direction:column;border-right:1px solid var(--line);box-shadow:20px 0 60px rgba(0,0,0,.4)}
+.drawer.open{transform:none}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer-head h3{font-family:var(--fd);font-weight:400;font-size:1.4rem}
+.drawer-list{flex:1;overflow-y:auto;padding:8px 20px}
+.c-item{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px dashed var(--line)}
+.ci-info{flex:1;min-width:0}
+.ci-info h4{font-size:.9rem;font-weight:800}
+.ci-price{font-size:.74rem;color:var(--muted)}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--cream);font-size:1.05rem;transition:.2s}
+.qty button:hover{border-color:var(--amber);color:var(--amber)}
+.qty b{min-width:26px;text-align:center}
+.drawer-foot{padding:16px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.total-row{display:flex;justify-content:space-between;font-weight:800;margin-bottom:12px}
+.total-row b{color:var(--amber);font-size:1.1rem}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:85;opacity:0;pointer-events:none;transition:.3s}
+.overlay.show{opacity:1;pointer-events:auto}
+/* مودال‌ها */
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(10,6,3,.72);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.3s;padding:16px}
+.modal.open{opacity:1;pointer-events:auto}
+.modal-card{width:min(420px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 24px;text-align:center;transform:translateY(24px) scale(.96);transition:.35s;position:relative;max-height:90vh;overflow-y:auto}
+.modal.open .modal-card{transform:none}
+.modal-card.shake{animation:shake .45s}
+.modal-card .m-ic{font-size:2.4rem;display:block;margin-bottom:6px}
+.modal-card h3{font-family:var(--fd);font-size:1.6rem;font-weight:400;margin-bottom:4px}
+.modal-card p{font-size:.8rem;color:var(--muted);margin-bottom:14px}
+.modal-card input,.modal-card textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--cream);margin-bottom:10px}
+.modal-card input:focus,.modal-card textarea:focus{outline:none;border-color:var(--amber)}
+.modal-card textarea{resize:vertical;min-height:60px}
+.m-err{font-size:.75rem;color:var(--red);min-height:20px;margin-bottom:6px}
+.m-close{position:absolute;top:12px;left:14px;background:none;border:none;color:var(--muted);font-size:1.1rem}
+.m-close:hover{color:var(--cream)}
+.success-num{font-family:var(--fd);font-size:2.6rem;color:var(--amber);margin:8px 0}
+.admin-bar{position:fixed;bottom:18px;right:50%;transform:translateX(50%) translateY(90px);z-index:60;display:flex;align-items:center;gap:12px;background:#2c1f12;border:1px solid var(--amber);border-radius:999px;padding:9px 12px 9px 18px;box-shadow:0 14px 40px rgba(0,0,0,.55);max-width:calc(100vw - 24px);transition:transform .4s cubic-bezier(.2,.9,.3,1.3)}
+body.admin .admin-bar{transform:translateX(50%) translateY(0)}
+body.admin{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+.admin-bar .dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(125,219,138,.5)}55%{box-shadow:0 0 0 7px rgba(125,219,138,0)}}
+.admin-bar span{font-size:.8rem;font-weight:700;white-space:nowrap}
+.admin-bar button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 14px;font-family:var(--fb);font-size:.75rem;flex-shrink:0}
+.admin-bar button:hover{color:var(--red);border-color:var(--red)}
+.toast{position:fixed;bottom:96px;right:50%;transform:translateX(50%) translateY(20px);z-index:120;background:#2c1f12;border:1px solid var(--amber);color:var(--cream);border-radius:999px;padding:10px 22px;font-size:.83rem;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.35s;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(50%) translateY(0)}
+footer{border-top:1px solid var(--line);padding:32px 18px calc(36px + env(safe-area-inset-bottom));text-align:center}
+.f-brand{font-family:var(--fd);font-size:1.7rem;color:var(--amber)}
+footer p{font-size:.85rem;color:var(--muted)}
+.f-meta{margin-top:12px;font-size:.72rem!important;opacity:.7}
+@media(max-width:820px){.board{grid-template-columns:1fr;text-align:center}.board-art{order:-1}.stats{justify-content:center}}
+@media(max-width:680px){.tabs{grid-template-columns:repeat(2,1fr);position:static;gap:8px}.row-acts{flex-direction:row}}
+@media(max-width:540px){.row{flex-direction:column;align-items:stretch;gap:10px}.row-acts{flex-direction:row;justify-content:flex-end}.add-btn{align-self:flex-end}.frow.end{flex-direction:column;align-items:stretch}.frow.end>*{width:100%}.admin-tabs button{flex:1;padding:9px 10px;font-size:.76rem}.qr-row .btn-amber,.qr-row .btn-ghost{width:100%}}
+@media(max-width:380px){.row-line{flex-wrap:wrap}.leader{min-width:10px}.tab .t-name{font-size:.78rem}}
+/* چاپ */
+.print-area{display:none}
+.p-page{width:210mm;height:297mm;background:#1d140c;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.p-tent{width:100%;height:148.5mm;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:10mm}
+.p-tent.p-flip{transform:rotate(180deg)}
+.p-frame{position:absolute;inset:7mm;border:2.5px solid var(--amber);border-radius:10px;pointer-events:none}
+.p-frame::after{content:'';position:absolute;inset:2.5mm;border:1px dashed rgba(224,166,62,.4);border-radius:7px}
+.p-head{display:flex;align-items:center;gap:4mm;z-index:1}
+.p-head svg{width:17mm;height:17mm}
+.p-head h2{font-family:var(--fd);font-weight:400;font-size:32pt;line-height:1;color:var(--cream)}
+.p-head h2 b{color:var(--amber);font-weight:400}
+.p-sub{font-size:10.5pt;color:var(--muted);margin-top:3mm;z-index:1}
+.p-qrbox{margin-top:7mm;background:#fff;border-radius:5mm;padding:3.5mm;z-index:1}
+.p-qrbox img{width:52mm;height:52mm;display:block}
+.p-scan{margin-top:6mm;font-size:15pt;font-weight:800;z-index:1;text-align:center;color:var(--cream)}
+.p-scan small{display:block;font-size:9pt;color:var(--muted);font-weight:400;margin-top:1.5mm}
+.p-fold{position:absolute;top:50%;left:0;right:0;border-top:2px dashed rgba(224,166,62,.55);z-index:5;display:flex;justify-content:center;pointer-events:none}
+.p-fold span{position:relative;top:-11px;background:#1d140c;padding:0 16px;font-size:10pt;color:var(--amber)}
+.p-page2{min-height:297mm;height:auto;padding:10mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm;page-break-before:always}
+.p-sticker{height:88mm;background:var(--card);border:2px solid var(--amber);border-radius:6mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4mm}
+.p-sticker h3{font-family:var(--fd);font-weight:400;font-size:20pt;color:var(--cream);margin-top:2mm}
+.p-sticker h3 b{color:var(--amber);font-weight:400}
+.p-sticker .p-qrbox{margin-top:3mm;padding:3mm;border-radius:4mm}
+.p-sticker .p-qrbox img{width:42mm;height:42mm}
+.p-sticker p{font-size:10pt;font-weight:800;margin-top:3.5mm;color:var(--cream)}
+.p-sticker small{font-size:8pt;color:var(--muted);margin-top:1mm;direction:ltr}
+.p-scream{stroke:var(--cream)}
+body.qr-light .p-page{background:#fdf9f0}
+body.qr-light .p-fold span{background:#fdf9f0;color:#a87b23}
+body.qr-light .p-fold{border-color:rgba(168,123,35,.5)}
+body.qr-light .p-frame{border-color:#c98b2d}
+body.qr-light .p-head h2,body.qr-light .p-scan,body.qr-light .p-sticker h3,body.qr-light .p-sticker p{color:#2a1c0e}
+body.qr-light .p-sub,body.qr-light .p-scan small,body.qr-light .p-sticker small{color:#7a6752}
+body.qr-light .p-sticker{background:#fff;border-color:#c98b2d}
+body.qr-light .p-scream{stroke:#2a1c0e}
+@media print{@page{size:A4;margin:0}body.print-qr{padding:0!important;background:#fff}body.print-qr #app,body.print-qr .admin-bar,body.print-qr .toast,body.print-qr .bg-layers,body.print-qr .wm,body.print-qr .modal,body.print-qr .drawer,body.print-qr .overlay,body.print-qr .cart-fab{display:none!important}body.print-qr .print-area{display:block}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body data-cat="hot">
+
+<div id="app">
+<div class="bg-layers"><div class="glow g1"></div><div class="glow g2"></div></div>
+<div class="wm">گوزن</div>
+
+<header>
+  <div class="h-in">
+    <div class="brand">
+      <svg viewBox="0 0 200 200" fill="none" stroke-linecap="round">
+        <path d="M78 66 C74 46 62 36 46 34 M78 58 C70 52 64 42 64 30 M122 66 C126 46 138 36 154 34 M122 58 C130 52 136 42 136 30" stroke="#e0a63e" stroke-width="8"/>
+        <path d="M70 78 h60 l-6 46 a14 14 0 0 1 -14 12 h-20 a14 14 0 0 1 -14 -12 z M130 84 h10 a14 14 0 0 1 0 28 h-7 M58 152 h84" stroke="#f2e7d5" stroke-width="8"/>
+      </svg>
+      <div><h2>کافی‌شاپ گوزن</h2><small>منو و سفارش آنلاین</small></div>
+    </div>
+    <div class="h-left">
+      <span class="hours">🕗 همه‌روزه ۸ صبح تا ۱۲ شب</span>
+      <button class="lock-btn" id="lockBtn">🔐 مدیریت</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="board">
+    <div>
+      <span class="eyebrow">🦌 منوی رسمی خانه</span>
+      <h1>کافی‌شاپ <span class="hl">گوزن</span></h1>
+      <p class="sub">امروز هوسِ <span class="rot" id="rotWord">یه نوشیدنیِ گرم ☕</span> کردی؟</p>
+      <div class="stats">
+        <span class="pill">🗂 <b>۴</b> دسته‌بندی</span>
+        <span class="pill">🥤 <b id="totalStat">۰</b> نوشیدنی</span>
+        <span class="pill">🛎 سفارش آنلاین از میز</span>
+      </div>
+    </div>
+    <div class="board-art">
+      <svg class="cup-svg" viewBox="0 0 200 200" fill="none" stroke-linecap="round">
+        <g class="steam"><path d="M88 62 q-5 -8 0 -16 q5 -8 0 -16"/><path d="M112 62 q-5 -8 0 -16 q5 -8 0 -16"/></g>
+        <path d="M78 72 C74 50 62 40 46 38 M78 63 C70 57 64 46 64 34 M122 72 C126 50 138 40 154 38 M122 63 C130 57 136 46 136 34" stroke="#e0a63e" stroke-width="8"/>
+        <path d="M70 84 h60 l-6 46 a14 14 0 0 1 -14 12 h-20 a14 14 0 0 1 -14 -12 z" stroke="#f2e7d5" stroke-width="8"/>
+        <path d="M129 90 h10 a14 14 0 0 1 0 28 h-6" stroke="#f2e7d5" stroke-width="8"/>
+        <path d="M56 158 h88" stroke="#e0a63e" stroke-width="8"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab" data-cat="cold"><span class="t-ic">🧊</span><span class="t-name">نوشیدنی سرد</span><span class="t-count" id="cnt-cold">۰</span></button>
+    <button class="tab" data-cat="shake"><span class="t-ic">🥤</span><span class="t-name">شیک</span><span class="t-count" id="cnt-shake">۰</span></button>
+    <button class="tab active" data-cat="hot"><span class="t-ic">☕</span><span class="t-name">نوشیدنی گرم</span><span class="t-count" id="cnt-hot">۰</span></button>
+    <button class="tab" data-cat="fruit"><span class="t-ic">🍓</span><span class="t-name">میوه‌ای</span><span class="t-count" id="cnt-fruit">۰</span></button>
+  </nav>
+
+  <div class="toolbar">
+    <div class="search"><input type="text" id="searchInput" placeholder="جستجوی نوشیدنی..."></div>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+
+  <section class="admin-box" id="adminBox" hidden>
+    <div class="setup-banner" id="setupBanner" hidden>
+      ⚠️ <b>حالت آفلاین:</b> هنوز به سرور متصل نیستید؛ تغییرات فقط روی همین دستگاه ذخیره می‌شود و مشتریان آن را نمی‌بینند.
+      برای اتصال، راهنمای ساخت پروژهٔ رایگان فایربیس را دنبال کنید و تنظیمات را در ابتدای کد وارد کنید.
+    </div>
+    <div class="admin-tabs">
+      <button data-atab="items" class="active">➕ آیتم‌های منو</button>
+      <button data-atab="orders">🛎 سفارش‌ها <span class="ord-badge" id="ordBadge" hidden>۰</span></button>
+      <button data-atab="qr">🔳 کد QR میزها</button>
+    </div>
+
+    <div id="atab-items">
+      <div class="admin-head">
+        <h3>➕ <span id="formTitle">افزودن آیتم</span></h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" id="seedBtn" hidden>📥 بارگذاری منوی نمونه روی سرور</button>
+          <button class="btn-ghost" id="cancelEdit" hidden>✖ انصراف از ویرایش</button>
+        </div>
+      </div>
+      <form id="itemForm" autocomplete="off">
+        <div class="frow">
+          <input type="text" id="fName" placeholder="نام نوشیدنی *">
+          <input type="text" id="fPrice" placeholder="قیمت به تومان *" inputmode="numeric">
+        </div>
+        <div class="price-hint" id="priceHint"></div>
+        <div class="frow"><input type="text" id="fDesc" placeholder="توضیح کوتاه (اختیاری)"></div>
+        <div class="frow end">
+          <label class="toggle"><input type="checkbox" id="fFeat"><span>⭐ پیشنهاد ویژه</span></label>
+          <button class="btn-amber" type="submit" id="submitBtn">افزودن به منو</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="atab-orders" hidden>
+      <div class="admin-head"><h3>🛎 سفارش‌های مشتریان (زنده)</h3><button class="btn-ghost" id="refreshOrders">🔄 به‌روزرسانی</button></div>
+      <div id="ordersList"><div class="empty"><span class="ei">🛎</span><p>هنوز سفارشی ثبت نشده است.</p></div></div>
+    </div>
+
+    <div id="atab-qr" hidden>
+      <p class="qr-note">
+        <b>۱.</b> این فایل را در <code>app.netlify.com/drop</code> یا هاست خود منتشر کنید تا آدرس اینترنتی بگیرید.<br>
+        <b>۲.</b> آدرس سایت را پایین وارد کنید و «ساخت QR» را بزنید؛ با گوشی اسکن و تست کنید.<br>
+        <b>۳.</b> چاپ کنید: صفحهٔ چاپ = کارت تاشوی رومیزی (دو رو) + ۴ برچسب میز ✂
+      </p>
+      <div class="qr-row">
+        <input type="text" id="qrUrl" value="https://example.com/menu" placeholder="https://...">
+        <button class="btn-amber" id="qrGenBtn">🔄 ساخت QR</button>
+        <button class="btn-ghost" id="qrPrintBtn" style="padding:12px 20px">🖨 چاپ کارت رومیزی</button>
+        <label class="qr-light-lbl"><input type="checkbox" id="qrLight"> حالت روشن (جوهر کمتر)</label>
+      </div>
+      <div class="qr-warn" id="qrWarn"></div>
+      <div class="qr-preview"><img id="qrPreview" class="qr" alt="QR"></div>
+    </div>
+  </section>
+
+  <div class="panel-head">
+    <div class="ph-ic" id="phIcon">☕</div>
+    <div><h2 id="phName">نوشیدنی گرم</h2><p id="phDesc"></p></div>
+  </div>
+  <div class="list" id="list"></div>
+</div>
+
+<footer>
+  <div class="f-brand">☕ کافی‌شاپ گوزن</div>
+  <p>طعمِ جنگل، در فنجانِ شما 🦌</p>
+  <p class="f-meta">بنیان‌گذار: سیدرضا موسوی &nbsp;•&nbsp; © ۱۴۰۵ تمامی حقوق محفوظ است</p>
+</footer>
+</div>
+
+<!-- سبد خرید -->
+<button class="cart-fab" id="cartFab">🛒<span class="c-count" id="cartCount" hidden>۰</span></button>
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head"><h3>🛒 سفارش شما</h3><button class="m-close" style="position:static" id="closeDrawer">✕</button></div>
+  <div class="drawer-list" id="cartList"></div>
+  <div class="drawer-foot">
+    <div class="total-row"><span>جمع کل:</span><b id="cartTotal">۰ تومان</b></div>
+    <button class="btn-amber" id="checkoutBtn" style="width:100%">ثبت سفارش 🛎</button>
+  </div>
+</div>
+
+<!-- مودال ثبت سفارش -->
+<div class="modal" id="checkoutModal">
+  <div class="modal-card" id="checkoutCard">
+    <button class="m-close" data-close="checkoutModal">✕</button>
+    <span class="m-ic">🛎</span>
+    <h3>ثبت سفارش</h3>
+    <div id="checkoutForm">
+      <p>مشخصات را وارد کنید تا سفارش شما به بارسمن ارسال شود.</p>
+      <input type="text" id="coName" placeholder="نام شما *">
+      <input type="text" id="coTable" placeholder="شماره میز * (مثلاً ۳)" inputmode="numeric">
+      <textarea id="coNote" placeholder="توضیح برای بارسمن (اختیاری)"></textarea>
+      <div class="total-row" style="text-align:right"><span>مبلغ قابل پرداخت:</span><b id="coTotal" style="color:var(--amber)">۰ تومان</b></div>
+      <div class="m-err" id="coErr"></div>
+      <button class="btn-amber" id="coSubmit" style="width:100%">ارسال سفارش ✅</button>
+    </div>
+    <div id="checkoutSuccess" hidden>
+      <span class="m-ic">✅</span>
+      <h3>سفارش شما ثبت شد!</h3>
+      <p>شمارهٔ سفارش شما:</p>
+      <div class="success-num" id="successNum"></div>
+      <p>لطفاً منتظر بمانید؛ به‌زودی آماده می‌شود. 🦌</p>
+      <button class="btn-amber" data-close="checkoutModal" style="width:100%">باشه، ممنون</button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال ورود مدیریت -->
+<div class="modal" id="loginModal">
+  <div class="modal-card" id="modalCard">
+    <button class="m-close" data-close="loginModal">✕</button>
+    <span class="m-ic">🔐</span>
+    <h3>ورود مدیریت</h3>
+    <p>این بخش مخصوص مدیریت کافی‌شاپ گوزن است</p>
+    <input type="password" id="pwdInput" placeholder="رمز عبور">
+    <div class="m-err" id="pwdErr"></div>
+    <button class="btn-amber" id="pwdSubmit" style="width:100%">ورود به پنل</button>
+  </div>
+</div>
+
+<!-- ناحیه چاپ -->
+<div class="print-area">
+  <div class="p-page">
+    <div class="p-tent" id="tentA">
+      <div class="p-frame"></div>
+      <div class="p-head">
+        <svg viewBox="0 0 200 200" fill="none" stroke-linecap="round">
+          <path d="M78 66 C74 46 62 36 46 34 M78 58 C70 52 64 42 64 30 M122 66 C126 46 138 36 154 34 M122 58 C130 52 136 42 136 30" stroke="#e0a63e" stroke-width="8"/>
+          <path class="p-scream" d="M70 78 h60 l-6 46 a14 14 0 0 1 -14 12 h-20 a14 14 0 0 1 -14 -12 z M130 84 h10 a14 14 0 0 1 0 28 h-7 M58 152 h84" stroke-width="8"/>
+        </svg>
+        <h2>کافی‌شاپ <b>گوزن</b></h2>
+      </div>
+      <div class="p-sub">☕ منو و سفارش آنلاین نوشیدنی‌های سرد، گرم، شیک و میوه‌ای</div>
+      <div class="p-qrbox"><img class="qr" alt="QR"></div>
+      <div class="p-scan">📱 منو را ببینید و سفارش دهید
+        <small>بدون نصب برنامه — فقط دوربین گوشی</small>
+      </div>
+    </div>
+    <div class="p-fold"><span>✂ ─ ─ ─ از اینجا تا کنید ─ ─ ─ ✂</span></div>
+    <div class="p-tent p-flip" id="tentB"></div>
+  </div>
+  <div class="p-page p-page2" id="page2"></div>
+</div>
+
+<template id="stickerTpl">
+  <div class="p-sticker">
+    <svg viewBox="0 0 200 200" fill="none" stroke-linecap="round" style="width:11mm;height:11mm">
+      <path d="M78 66 C74 46 62 36 46 34 M78 58 C70 52 64 42 64 30 M122 66 C126 46 138 36 154 34 M122 58 C130 52 136 42 136 30" stroke="#e0a63e" stroke-width="8"/>
+      <path class="p-scream" d="M70 78 h60 l-6 46 a14 14 0 0 1 -14 12 h-20 a14 14 0 0 1 -14 -12 z M130 84 h10 a14 14 0 0 1 0 28 h-7 M58 152 h84" stroke-width="8"/>
+    </svg>
+    <h3>کافی‌شاپ <b>گوزن</b></h3>
+    <div class="p-qrbox"><img class="qr" alt="QR"></div>
+    <p>📱 اسکن کن، سفارش بده!</p>
+    <small>instagram.com/gavazn_coffee</small>
+  </div>
+</template>
+
+<div class="admin-bar">
+  <span class="dot"></span><span>حالت مدیریت فعال است 🦌</span>
+  <button id="exitAdmin">خروج</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═════════ تنظیمات فایربیس ═════════
+   بعد از ساخت پروژه (راهنما در پیام من)، مقادیر را اینجا جایگزین کنید */
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+
+const FIRE = !!firebaseConfig.projectId && typeof firebase!=='undefined';
+let db=null;
+if(FIRE){ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); }
+
+const CATS=[
+ {id:'cold',name:'نوشیدنی سرد',icon:'🧊',desc:'خنک، تازه و یخی؛ رفیق روزهای گرم'},
+ {id:'shake',name:'شیک',icon:'🥤',desc:'غلیظ، خامه‌ای و پرانرژی'},
+ {id:'hot',name:'نوشیدنی گرم',icon:'☕',desc:'عطر قهوه‌ی تازه‌دم و نوشیدنی‌های دلچسب'},
+ {id:'fruit',name:'نوشیدنی میوه‌ای',icon:'🍓',desc:'میوه‌ی طبیعی، بدون اسانس'},
+];
+const KEY='gavaznMenu_v1', AKEY='gavaznAdmin';
+const STATUS={
+ new:{label:'جدید',color:'#e8a84b',next:'prep'},
+ prep:{label:'در حال آماده‌سازی',color:'#86d7e4',next:'ready'},
+ ready:{label:'آماده‌ی سرو',color:'#7ddb8a',next:'done'},
+ done:{label:'تحویل شد',color:'#b4a084',next:null}
+};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const seedItems=[
+ ['cold','آیس آمریکانو','اسپرسو دوقلو روی یخ و آب خنک',98000,0],
+ ['cold','آیس لاته','شیر سرد و اسپرسو با سیروپ دلخواه',115000,0],
+ ['cold','کلد برو','دم‌کرده‌ی سرد ۱۸ ساعته؛ نرم و خوش‌عطر',120000,1],
+ ['cold','لیموناد نعنا','لیموی تازه، نعنا و سودا',95000,0],
+ ['shake','شیک شکلات بلژیکی','بستنی وانیل، شکلات تلخ و شیر',145000,1],
+ ['shake','شیک توت‌فرنگی','توت‌فرنگی تازه و بستنی وانیل',138000,0],
+ ['shake','شیک پسته','بستنی پسته با خلال پسته',158000,0],
+ ['shake','شیک قهوه گوزن','اسپرسو، بستنی و سس کارامل خانگی',150000,1],
+ ['hot','اسپرسو','تک‌شات یا دبل؛ رُست تازه‌ی خانه',75000,0],
+ ['hot','کاپوچینو','با فوم شیر مخملی و پودر دارچین',105000,0],
+ ['hot','کافه لاته','اسپرسو و شیر بخارخورده',110000,0],
+ ['hot','هات چاکلت','شکلات بلژیکی با مارشمالو',118000,0],
+ ['hot','ماگِ گوزن','ترکیب ویژه‌ی خانه؛ اسپرسو، شیر و دارچین',135000,1],
+ ['fruit','اسموتی انبه','انبه‌ی رسیده و ماست',140000,1],
+ ['fruit','آب پرتقال طبیعی','پرتقال تازه، بدون شکر',98000,0],
+ ['fruit','اسموتی استوایی','انبه، آنان و شیرنارگیل',152000,0],
+];
+
+let menuItems=[], orders=[], menuLoaded=false, prevNewOrders=0;
+let state={cat:'hot',q:'',admin:localStorage.getItem(AKEY)==='1',editing:null};
+let cart=JSON.parse(sessionStorage.getItem('gavaznCart')||'[]');
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const faD='۰۱۲۳۴۵۶۷۸۹';
+const toFa=s=>String(s).replace(/\d/g,d=>faD[d]);
+const toEnNum=s=>String(s).replace(/[۰-۹]/g,d=>faD.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^0-9]/g,'');
+const fmt=n=>(+n).toLocaleString('fa-IR');
+const catMeta=id=>CATS.find(c=>c.id===id);
+const saveLocal=()=>localStorage.setItem(KEY,JSON.stringify(menuItems));
+const loadLocal=()=>{try{const d=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(d))return d;}catch(e){}return seedItems.map((s,i)=>({id:uid(),cat:s[0],name:s[1],desc:s[2],price:s[3],featured:!!s[4],sort:i}));};
+
+let toastTimer;
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600);}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
+const watchReveals=()=>document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+
+/* ═════ داده‌ها ═════ */
+function startData(){
+ if(FIRE){
+  db.collection('menu').orderBy('sort').onSnapshot(s=>{
+   menuItems=s.docs.map(d=>({id:d.id,...d.data()}));
+   menuLoaded=true;renderAll();checkSeed();
+  },err=>{toast('⚠️ خطا در اتصال به سرور');console.error(err);});
+  db.collection('orders').orderBy('createdAt','desc').limit(100).onSnapshot(s=>{
+   orders=s.docs.map(d=>({id:d.id,...d.data()}));
+   renderOrders();newOrderAlert();
+  },err=>console.error(err));
+ }else{
+  menuItems=loadLocal();menuLoaded=true;renderAll();
+  $('setupBanner').hidden=false;
+ }
+}
+function checkSeed(){
+ $('seedBtn').hidden=!(state.admin&&FIRE&&menuItems.length===0);
+}
+function checkAdminUI(){
+ $('setupBanner').hidden=FIRE;
+ checkSeed();
+}
+/* عملیات آیتم‌ها */
+function itemAdd(data){
+ if(FIRE){db.collection('menu').add({...data,sort:Date.now()}).then(()=>toast('✅ به منو اضافه شد')).catch(e=>toast('⚠️ خطا در ذخیره'));}
+ else{data.id=uid();data.sort=Date.now();menuItems.push(data);saveLocal();renderAll();toast('✅ به منو اضافه شد');}
+}
+function itemUpdate(id,data){
+ if(FIRE){db.collection('menu').doc(id).update(data).then(()=>toast('✅ تغییرات ذخیره شد')).catch(e=>toast('⚠️ خطا در ذخیره'));}
+ else{const it=menuItems.find(i=>i.id===id);if(it)Object.assign(it,data);saveLocal();renderAll();toast('✅ تغییرات ذخیره شد');}
+}
+function itemDelete(id){
+ if(FIRE){db.collection('menu').doc(id).delete().then(()=>toast('🗑 آیتم حذف شد')).catch(e=>toast('⚠️ خطا'));}
+ else{menuItems=menuItems.filter(i=>i.id!==id);saveLocal();renderAll();toast('🗑 آیتم حذف شد');}
+}
+function seedServer(){
+ if(!FIRE)return;
+ $('seedBtn').disabled=true;$('seedBtn').textContent='در حال بارگذاری...';
+ const batch=db.batch();
+ seedItems.forEach((s,i)=>{batch.set(db.collection('menu').doc(),{cat:s[0],name:s[1],desc:s[2],price:s[3],featured:!!s[4],sort:Date.now()+i});});
+ batch.commit().then(()=>toast('✅ منوی نمونه روی سرور ثبت شد')).catch(e=>toast('⚠️ خطا در بارگذاری'));
+}
+/* ثبت سفارش */
+function placeOrder(order){
+ if(!FIRE){toast('⚠️ سفارش آنلاین فقط پس از اتصال به سرور فعال می‌شود');return Promise.reject();}
+ return db.collection('orders').add(order);
+}
+function setOrderStatus(id,status){ db.collection('orders').doc(id).update({status}); }
+function deleteOrder(id){ db.collection('orders').doc(id).delete(); }
+
+/* ═════ رندر منو ═════ */
+function rowHTML(item,i){
+ return `<article class="row reveal" style="--d:${i*40}ms" data-id="${item.id}">
+  <div class="row-main">
+   <div class="row-line">
+    <h3>${esc(item.name)}${item.featured?'<span class="badge">⭐ ویژه</span>':''}</h3>
+    <span class="leader"></span>
+    <div class="price"><b>${fmt(item.price)}</b><small>تومان</small></div>
+   </div>
+   ${item.desc?`<p>${esc(item.desc)}</p>`:''}
+  </div>
+  ${state.admin?`<div class="row-acts">
+    <button class="act edit" data-act="edit">✏️ ویرایش</button>
+    <button class="act del" data-act="del">🗑 حذف</button>
+   </div>`
+  :`<button class="add-btn" data-act="add">+ سفارش</button>`}
+ </article>`;
+}
+function renderPanel(){
+ const meta=catMeta(state.cat),all=menuItems.filter(i=>i.cat===state.cat),q=state.q.trim();
+ const list=q?all.filter(i=>(i.name+(i.desc||'')).includes(q)):all;
+ $('phIcon').textContent=meta.icon;$('phName').textContent=meta.name;$('phDesc').textContent=meta.desc;
+ $('resultCount').textContent=toFa(list.length)+' نوشیدنی';
+ if(!menuLoaded){$('list').innerHTML='<div class="empty"><span class="ei">☕</span><p>در حال بارگذاری منو...</p></div>';return;}
+ $('list').innerHTML=list.length?list.map(rowHTML).join('')
+  :`<div class="empty reveal"><span class="ei">🍂</span><p>${q?'موردی با این عبارت پیدا نشد.':'هنوز آیتمی در این دسته ثبت نشده است.'}</p></div>`;
+ watchReveals();
+ if(state.admin)$('formTitle').textContent=state.editing?'ویرایش آیتم':`افزودن آیتم به «${meta.name}»`;
+}
+function renderCounts(){
+ let total=0;
+ CATS.forEach(c=>{const n=menuItems.filter(i=>i.cat===c.id).length;total+=n;$('cnt-'+c.id).textContent=toFa(n);});
+ $('totalStat').textContent=toFa(total);
+}
+function renderTicker(){
+ const names=[...menuItems].sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)).slice(0,18).map(i=>i.name);
+ if(!names.length){$('tickerTrack').innerHTML='';return;}
+ const seg=names.map(n=>`<span>${esc(n)}</span><i>✦</i>`).join('');
+ const t=$('tickerTrack');t.innerHTML=seg+seg;t.style.setProperty('--dur',(names.length*3.4)+'s');
+}
+function renderAll(){
+ document.body.dataset.cat=state.cat;
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.cat===state.cat));
+ renderCounts();renderPanel();renderTicker();
+}
+const rotEl=$('rotWord');
+function setRotWord(){
+ const w={'cold':'یه نوشیدنیِ سرد 🧊','shake':'یه شیکِ خامه‌ای 🥤','hot':'یه نوشیدنیِ گرم ☕','fruit':'یه نوشیدنیِ میوه‌ای 🍓'};
+ rotEl.classList.add('hide');
+ setTimeout(()=>{rotEl.textContent=w[state.cat];rotEl.classList.remove('hide');},300);
+}
+$('tabs').addEventListener('click',e=>{
+ const btn=e.target.closest('.tab');if(!btn)return;
+ state.cat=btn.dataset.cat;state.editing=null;resetForm();renderAll();setRotWord();
+});
+$('searchInput').addEventListener('input',e=>{state.q=e.target.value;renderPanel();});
+
+/* اکشن‌های آیتم (سفارش / ویرایش / حذف) */
+$('list').addEventListener('click',e=>{
+ const btn=e.target.closest('[data-act]');if(!btn)return;
+ const id=btn.closest('.row').dataset.id;
+ const item=menuItems.find(i=>i.id===id);if(!item)return;
+ const act=btn.dataset.act;
+ if(act==='add'){addToCart(item);return;}
+ if(act==='edit'){
+  state.editing=id;
+  $('fName').value=item.name;$('fPrice').value=item.price;$('fDesc').value=item.desc||'';$('fFeat').checked=!!item.featured;
+  $('priceHint').textContent='معادل: '+fmt(item.price)+' تومان';
+  $('submitBtn').textContent='ذخیره‌ی تغییرات';$('cancelEdit').hidden=false;
+  $('adminBox').scrollIntoView({behavior:'smooth',block:'center'});renderPanel();
+ }else if(act==='del'){
+  if(btn.classList.contains('confirm')){itemDelete(id);if(state.editing===id)resetForm();renderAll();}
+  else{btn.classList.add('confirm');btn.textContent='مطمئنم؟';setTimeout(()=>{btn.classList.remove('confirm');btn.textContent='🗑 حذف';},2800);}
+ }
+});
+
+/* ═════ سبد خرید ═════ */
+function saveCart(){sessionStorage.setItem('gavaznCart',JSON.stringify(cart));}
+function addToCart(item){
+ const ex=cart.find(c=>c.id===item.id);
+ if(ex)ex.qty++;else cart.push({id:item.id,name:item.name,price:item.price,qty:1});
+ saveCart();renderCart();toast(`«${item.name}» به سفارش اضافه شد 🛒`);
+}
+function changeQty(id,d){
+ const it=cart.find(c=>c.id===id);if(!it)return;
+ it.qty+=d;if(it.qty<=0)cart=cart.filter(c=>c.id!==id);
+ saveCart();renderCart();
+}
+function cartTotal(){return cart.reduce((s,c)=>s+c.price*c.qty,0);}
+function renderCart(){
+ const n=cart.reduce((s,c)=>s+c.qty,0);
+ $('cartCount').hidden=n===0;$('cartCount').textContent=toFa(n);
+ $('cartList').innerHTML=cart.length?cart.map(c=>`
+  <div class="c-item">
+   <div class="ci-info"><h4>${esc(c.name)}</h4><div class="ci-price">${fmt(c.price)} تومان</div></div>
+   <div class="qty">
+    <button onclick="changeQty('${c.id}',1)">+</button><b>${toFa(c.qty)}</b>
+    <button onclick="changeQty('${c.id}',-1)">−</button>
+   </div>
+  </div>`).join('')
+ :'<div class="empty" style="border:none;padding:40px 0"><span class="ei">🛒</span><p>سبد شما خالی است.</p></div>';
+ $('cartTotal').textContent=fmt(cartTotal())+' تومان';
+}
+function openDrawer(o){$('drawer').classList.toggle('open',o);$('overlay').classList.toggle('show',o);}
+$('cartFab').onclick=()=>{renderCart();openDrawer(true);};
+$('closeDrawer').onclick=()=>openDrawer(false);
+$('overlay').onclick=()=>openDrawer(false);
+$('checkoutBtn').onclick=()=>{
+ if(!cart.length){toast('سبد شما خالی است ⚠️');return;}
+ openDrawer(false);
+ $('coTotal').textContent=fmt(cartTotal())+' تومان';
+ $('checkoutForm').hidden=false;$('checkoutSuccess').hidden=true;$('coErr').textContent='';
+ openModal('checkoutModal');
+};
+$('coSubmit').onclick=()=>{
+ const name=$('coName').value.trim(),table=toEnNum($('coTable').value),note=$('coNote').value.trim();
+ if(!name){$('coErr').textContent='نام خود را وارد کنید ⚠️';return;}
+ if(!table){$('coErr').textContent='شماره میز را وارد کنید ⚠️';return;}
+ $('coSubmit').disabled=true;$('coSubmit').textContent='در حال ارسال...';
+ placeOrder({name,table,note,items:cart,total:cartTotal(),status:'new',num:Math.floor(1000+Math.random()*9000),createdAt:Date.now()})
+ .then(()=>{
+  cart=[];saveCart();renderCart();
+  $('checkoutForm').hidden=true;$('checkoutSuccess').hidden=false;
+  $('successNum').textContent='№ '+toFa($('coName').dataset.num||'');
+ }).catch(()=>{$('coErr').textContent='⚠️ خطا در ثبت سفارش. دوباره تلاش کنید.';})
+ .finally(()=>{$('coSubmit').disabled=false;$('coSubmit').textContent='ارسال سفارش ✅';});
+};
+/* شماره سفارش برای نمایش موفقیت */
+document.addEventListener('click',e=>{
+ const cl=e.target.closest('[data-close]');if(cl)closeModal(cl.dataset.close);
+});
+
+/* ═════ سفارش‌ها (پنل مدیریت) ═════ */
+function newOrderAlert(){
+ const newCount=orders.filter(o=>o.status==='new').length;
+ const badge=$('ordBadge');
+ badge.hidden=newCount===0;badge.textContent=toFa(newCount);
+ if(state.admin&&newCount>prevNewOrders&&prevNewOrders>0)toast('🛎 یک سفارش جدید ثبت شد!');
+ prevNewOrders=newCount;
+}
+function renderOrders(){
+ if(!FIRE){$('ordersList').innerHTML='<div class="empty"><span class="ei">🛎</span><p>سفارش آنلاین فقط پس از اتصال به سرور فعال می‌شود.</p></div>';return;}
+ if(!orders.length){$('ordersList').innerHTML='<div class="empty"><span class="ei">🛎</span><p>هنوز سفارشی ثبت نشده است.</p></div>';return;}
+ $('ordersList').innerHTML=orders.map(o=>{
+  const st=STATUS[o.status]||STATUS.new;
+  const time=new Date(o.createdAt).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});
+  return `<div class="o-card st-${o.status}">
+   <div class="o-top">
+    <span class="o-num">№ ${toFa(o.num||'—')}</span>
+    <span class="o-time">🕐 ${time}</span>
+    <span class="status-chip" style="background:${st.color}">${st.label}</span>
+   </div>
+   <div class="o-cust">👤 ${esc(o.name)} &nbsp;•&nbsp; 🪑 میز ${toFa(o.table)}</div>
+   ${o.note?`<div class="o-cust"><small>📝 ${esc(o.note)}</small></div>`:''}
+   <ul class="o-items">${(o.items||[]).map(it=>`<li><span>${toFa(it.qty)}× ${esc(it.name)}</span><span>${fmt(it.price*it.qty)} تومان</span></li>`).join('')}</ul>
+   <div class="o-cust"><b style="color:var(--amber)">جمع: ${fmt(o.total)} تومان</b></div>
+   <div class="o-actions">
+    ${st.next?`<button class="next" onclick="setOrderStatus('${o.id}','${st.next}')">◀ ${STATUS[st.next].label}</button>`:''}
+    <button class="danger" onclick="confirmDelOrder(this,'${o.id}')">حذف</button>
+   </div>
+  </div>`;
+ }).join('');
+}
+function confirmDelOrder(btn,id){
+ if(btn.classList.contains('confirm')){deleteOrder(id);}
+ else{btn.classList.add('confirm');btn.textContent='مطمئنم؟';setTimeout(()=>{btn.classList.remove('confirm');btn.textContent='حذف';},2800);}
+}
+$('refreshOrders').onclick=()=>toast('🔄 سفارش‌ها به‌صورت زنده به‌روز می‌شوند');
+
+/* تب‌های پنل مدیریت */
+document.querySelectorAll('.admin-tabs button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.toggle('active',x===b));
+ ['items','orders','qr'].forEach(t=>$('atab-'+t).hidden=b.dataset.atab!==t);
+});
+
+/* ═════ مدیریت ═════ */
+function resetForm(){$('itemForm').reset();state.editing=null;$('submitBtn').textContent='افزودن به منو';$('cancelEdit').hidden=true;$('priceHint').textContent='';renderPanel();}
+function setAdmin(on){
+ state.admin=on;localStorage.setItem(AKEY,on?'1':'0');
+ document.body.classList.toggle('admin',on);
+ $('adminBox').hidden=!on;
+ $('lockBtn').textContent=on?'🔓 خروج از مدیریت':'🔐 مدیریت';
+ checkAdminUI();
+ if(!on)resetForm();else renderPanel();
+}
+$('lockBtn').onclick=()=>{if(state.admin){setAdmin(false);toast('از حالت مدیریت خارج شدید');}else openModal('loginModal');};
+$('exitAdmin').onclick=()=>{setAdmin(false);toast('از حالت مدیریت خارج شدید');};
+function openModal(id){$(id).classList.add('open');if(id==='loginModal')setTimeout(()=>$('pwdInput').focus(),250);}
+function closeModal(id){$(id).classList.remove('open');if(id==='loginModal'){$('pwdInput').value='';$('pwdErr').textContent='';}}
+const card=$('modalCard'),pwd=$('pwdInput');
+function tryLogin(){
+ if(pwd.value==='gavazn'){closeModal('loginModal');setAdmin(true);toast('به پنل مدیریت خوش آمدید 🦌');$('adminBox').scrollIntoView({behavior:'smooth',block:'center'});}
+ else{$('pwdErr').textContent='رمز عبور اشتباه است!';card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake');pwd.select();}
+}
+$('pwdSubmit').onclick=tryLogin;
+pwd.addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+$('fPrice').addEventListener('input',e=>{const v=toEnNum(e.target.value);$('priceHint').textContent=v?'معادل: '+fmt(v)+' تومان':'';});
+$('itemForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=$('fName').value.trim(),priceStr=toEnNum($('fPrice').value),desc=$('fDesc').value.trim(),feat=$('fFeat').checked;
+ let ok=true;
+ if(!name){$('fName').classList.add('err');ok=false;}
+ if(!priceStr||+priceStr<=0){$('fPrice').classList.add('err');ok=false;}
+ if(!ok){toast('نام و قیمت معتبر وارد کنید ⚠️');setTimeout(()=>{$('fName').classList.remove('err');$('fPrice').classList.remove('err');},600);return;}
+ const data={name,desc,price:+priceStr,featured:feat,cat:state.cat};
+ if(state.editing)itemUpdate(state.editing,data);else itemAdd(data);
+ resetForm();if(!FIRE)renderAll();
+});
+$('cancelEdit').onclick=resetForm;
+$('seedBtn').onclick=seedServer;
+
+/* ═════ QR ═════ */
+$('tentB').innerHTML=$('tentA').innerHTML;
+const tpl=$('stickerTpl').innerHTML;
+for(let i=0;i<4;i++)$('page2').insertAdjacentHTML('beforeend',tpl);
+function genQR(){
+ const url=$('qrUrl').value.trim(),w=$('qrWarn');
+ if(!url||!/^https?:\/\/[^.]+\.[^\s]+$/.test(url)){w.style.color='#e05656';w.textContent='⚠️ آدرس معتبر وارد کنید.';return;}
+ if(url.includes('example.com')){w.style.color='#e05656';w.textContent='⚠️ این آدرس نمونه است! آدرس واقعی سایت خود را وارد کنید.';}
+ else{w.style.color='#7ddb8a';w.textContent='✅ QR ساخته شد — قبل از چاپ با گوشی تست کنید.';}
+ const src='https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=4&color=241A11&data='+encodeURIComponent(url);
+ document.querySelectorAll('.qr').forEach(img=>img.src=src);
+ $('qrPreview').classList.add('on');
+}
+$('qrGenBtn').onclick=genQR;
+$('qrPrintBtn').onclick=()=>{if(!$('qrPreview').classList.contains('on'))genQR();document.body.classList.add('print-qr');setTimeout(()=>window.print(),200);};
+window.addEventListener('afterprint',()=>document.body.classList.remove('print-qr'));
+$('qrLight').onchange=e=>document.body.classList.toggle('qr-light',e.target.checked);
+
+/* شروع */
+if(state.admin)setAdmin(true);
+startData();setRotWord();renderCart();watchReveals();
+</script>
+</body>
+</html>
